@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"strings"
+	"regexp"
 )
 
 const goalsPath	= "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\TODO.org"
@@ -36,47 +39,76 @@ type Workout struct {
 	weight		 float64 
 }
 
-func goalPrinter(g Goal) {
-	fmt.Printf("\tGoal: %v\n", g)
+func goalParser() []*Goal {
+	// states
+	state := "none"
+
+	// goals array
+	goals := []*Goal{}
+
+	// regexes
+	longTermRegex, err := regexp.Compile(`^\* Long Term`)
+	epicRegex, err := regexp.Compile(`^\* Epic Goals`)
+	goalRegex, err := regexp.Compile(`^\*\* `)
+
+	// load the goals file
+	content, err := ioutil.ReadFile(goalsPath)
+	if err != nil { panic(err) }
+	lines := strings.Split(string(content), "\n")
+	if err != nil { panic(err) }
+
+	for _ ,line := range lines {
+		b := []byte(line)
+		if longTermRegex.Match(b) {
+			state = "longterm"
+		} else if epicRegex.Match(b){
+			state = "epic"
+		} else if goalRegex.Match(b) {
+			goalArray := strings.Split(line, "** ")
+			goalString := goalArray[1]
+			//fmt.Printf("Found an *%s* goal: %s\n", state, goalString)
+			g := Goal {
+				name: goalString,
+				description: state,
+				percent_complete: 0.0,
+			}
+			goals = append(goals, &g)
+		}
+	}
+	return goals
+}
+
+func goalPrinter(g *Goal) {
+	fmt.Printf("Name: %s\n", g.name)
+	fmt.Printf("Description: %s\n", g.description)
+	fmt.Printf("%g %%\n", g.percent_complete)
 }
 
 func workoutPrinter(w Workout) {
-	fmt.Printf("\tWorkout: %v\n", w)
+	fmt.Printf("Workout: %v\n", w)
 }
 
 func main() {
-	fmt.Printf("Parse...\n")
-	fmt.Printf("\tParse Long Term Goals\n")
-	longTermGoal := Goal {}
-	longTermGoal.name = "Long Term Goal"
-	longTermGoal.description = "Long Term Goal Description"
-	longTermGoal.percent_complete = 57.00
 
-	fmt.Printf("\tParse Epic Goals\n")
-	epicGoal := Goal {}
-	epicGoal.name = "Epic Goal"
-	epicGoal.description = "Epic Goal Description"
-	epicGoal.percent_complete = 33.00
+	// w1 := Workout{
+	// 	date: "2012-12-01",
+	// 	stretches:  true,
+	// 	walkRun:  1.3,
+	// 	squats:  10,
+	// 	pushups:  5,
+	// 	lunges:  4,
+	// 	planks:  20,
+	// 	jumpingJacks:  30,
+	// 	weight:  225.00,
+	// }
 
-	fmt.Printf("\tParse Fitness\n")
-	w1 := Workout{}
-	w1.date = "2012-12-01"
-	w1.stretches = true
-	w1.walkRun = 1.3
-	w1.squats = 10
-	w1.pushups = 5
-	w1.lunges = 4
-	w1.planks = 20
-	w1.jumpingJacks = 30
-	w1.weight = 225.00
-	fmt.Printf("\t\tYes/no: stretchs\n")
-	fmt.Printf("\t\tFloat: walk, run\n")
-	fmt.Printf("\t\tInt: squats, pushups, lunges, rows, plank, jumping jacks\n")
-	fmt.Printf("\t\tFloat: weight\n")
-
-	fmt.Printf("Execute template...\n")
-	// just printing stuff for now
-	goalPrinter(longTermGoal)
-	goalPrinter(epicGoal)
-	workoutPrinter(w1)
+	//goalPrinter(longTermGoal)
+	//goalPrinter(epicGoal)
+	//workoutPrinter(w1)
+	
+	goals := goalParser()
+	for _, goal := range goals {
+		goalPrinter(goal)
+		fmt.Println("")
+	}
 }
