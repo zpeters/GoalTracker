@@ -1,20 +1,56 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>Goals</title>
+<link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.min.js"></script>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
   </head>
   <body>
-    <h1>This is a Heading</h1>
-    <hr>
-    <table>
-      <tr>
-	<th>Name</th><th>Description</th><th>Percent Complete</th>
-      </tr>
-    {{range .}}
-      <tr>
-	<td>{{.Name}}</td><td>{{.Description}}</td><td>{{.PercentComplete}}</td>
-      </tr>
-    {{end}}
-    </table>
-    </ul>
+    <div class="row">
+      <div class="span2">
+	<h1>Goals</h1>
+      </div>
+      <div class="span10">
+	<table class="table table-bordered table-compact table-striped">
+	  <thead>
+	    <tr>
+	      <th>Name</th><th>Description</th><th>Percent Complete</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+
+	    {{range .Goals}}
+	    <tr>
+	      <td>{{.Name}}</td><td>{{.Description}}</td><td>{{.PercentComplete}}</td>
+	    </tr>
+	    {{end}}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span2">
+	<h1>Fitness</h1>
+      </div>
+      <div class="span10">
+	<table class="table table-bordered table-compact table-striped">
+	  <thead>
+	    <tr>
+	      <th>Date</th><th>Stretches</th><th>Walk Run</th><th>Squats</th><th>Pushups</th><th>Lunges</th><th>Rows</th><th>Planks</th><th>Jumping Jacks</th><th>Weight</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+
+	    {{range .Workouts}}
+	    <tr>
+	      <td>{{.Date}}</td><td>{{.Stretches}}</td><td>{{.WalkRun}}</td><td>{{.Squats}}</td><td>{{.Pushups}}</td><td>{{.Lunges}}</td><td>{{.Rows}}</td><td>{{.Planks}}</td><td>{{.JumpingJacks}}</td><td>{{.Weight}}</td>
+	    </tr>
+	    {{end}}
+	  </tbody>
+	</table>
+      </div>
+    </div>
   </body>
 </html>

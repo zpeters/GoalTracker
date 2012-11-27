@@ -30,16 +30,21 @@ type Goal struct {
 }
 
 type Workout struct {
-	date		 string
-	stretches	 bool
-	walkRun		 float64
-	squats		 int64
-	pushups		 int64
-	lunges		 int64
-	rows		 int64
-	planks		 int64
-	jumpingJacks	 int64
-	weight		 float64 
+	Date		 string
+	Stretches	 bool
+	WalkRun		 float64
+	Squats		 int64
+	Pushups		 int64
+	Lunges		 int64
+	Rows		 int64
+	Planks		 int64
+	JumpingJacks	 int64
+	Weight		 float64 
+}
+
+type Page struct {
+	Goals []Goal
+	Workouts []Workout
 }
 
 func goalParser() []Goal {
@@ -80,39 +85,23 @@ func goalParser() []Goal {
 	return goals
 }
 
-func goalPrinter(g Goal) {
-	fmt.Printf("Name: %s\n", g.Name)
-	fmt.Printf("Description: %s\n", g.Description)
-	fmt.Printf("%g %%\n", g.PercentComplete)
-}
-
-func workoutPrinter(w Workout) {
-	fmt.Printf("Workout: %v\n", w)
-}
-
 func main() {
 
-	// w1 := Workout{
-	// 	date: "2012-12-01",
-	// 	stretches:  true,
-	// 	walkRun:  1.3,
-	// 	squats:  10,
-	// 	pushups:  5,
-	// 	lunges:  4,
-	// 	planks:  20,
-	// 	jumpingJacks:  30,
-	// 	weight:  225.00,
-	// }
+	w1 := Workout{
+		Date: "2012-12-01",
+		Stretches:  true,
+		WalkRun:  1.3,
+		Squats:  10,
+		Pushups:  5,
+		Lunges:  4,
+		Planks:  20,
+		JumpingJacks:  30,
+		Weight:  225.00,
+	}
 
-	//goalPrinter(longTermGoal)
-	//goalPrinter(epicGoal)
-	//workoutPrinter(w1)
 	
 	goals := goalParser()
-	// for _, goal := range goals {
-	// 	goalPrinter(goal)
-	// 	fmt.Println("")
-	// }
+	workouts := []Workout{w1}
 
 	t := template.New("Template")
 	t, err := t.ParseFiles(templatePath)
@@ -121,7 +110,11 @@ func main() {
 	}
 
 	var out bytes.Buffer
-	err = t.Execute(&out, goals)
+	p := Page{
+		Goals: goals,
+		Workouts: workouts,
+	}
+	err = t.Execute(&out, p)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 	}

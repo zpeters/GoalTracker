@@ -1,0 +1,4 @@
+* create a workout parser
+* visualization insted of a simple table
+* some way to measure against goals
+* automation to check out most recent "ZachCore" to get update stats
