@@ -5,10 +5,13 @@ import (
 	"io/ioutil"
 	"strings"
 	"regexp"
+	"html/template"
+	"bytes"
 )
 
 const goalsPath	= "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\TODO.org"
-const fitnessPath= "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\Fitness.org"
+const fitnessPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\Fitness.org"
+const templatePath = "Template"
 
 const stretchesGoal	= true
 const walkRunGoal	= 1.0
@@ -107,8 +110,22 @@ func main() {
 	//workoutPrinter(w1)
 	
 	goals := goalParser()
-	for _, goal := range goals {
-		goalPrinter(goal)
-		fmt.Println("")
+	// for _, goal := range goals {
+	// 	goalPrinter(goal)
+	// 	fmt.Println("")
+	// }
+
+	t := template.New("Template")
+	t, err := t.ParseFiles(templatePath)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
 	}
+
+	var out bytes.Buffer
+	err = t.Execute(&out, goals)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	fmt.Printf(out.String())
 }

@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Title</title>
+  </head>
+  <body>
+    <h1>This is a Heading</h1>
+    <hr>
+    {{with .}}
+    {{range .}}
+    {{.name}}<br/>
+    {{end}}
+    {{end}}
+    </ul>
+  </body>
+</html>
