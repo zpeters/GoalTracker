@@ -24,9 +24,9 @@ const jumpingJacksGoal	= 30
 const weightGoal	= 190
 
 type Goal struct {
-	name			 string
-	description		 string
-	percent_complete	 float32
+	Name			 string
+	Description		 string
+	PercentComplete 	 float32
 }
 
 type Workout struct {
@@ -42,12 +42,12 @@ type Workout struct {
 	weight		 float64 
 }
 
-func goalParser() []*Goal {
+func goalParser() []Goal {
 	// states
 	state := "none"
 
 	// goals array
-	goals := []*Goal{}
+	goals := []Goal{}
 
 	// regexes
 	longTermRegex, err := regexp.Compile(`^\* Long Term`)
@@ -69,22 +69,21 @@ func goalParser() []*Goal {
 		} else if goalRegex.Match(b) {
 			goalArray := strings.Split(line, "** ")
 			goalString := goalArray[1]
-			//fmt.Printf("Found an *%s* goal: %s\n", state, goalString)
 			g := Goal {
-				name: goalString,
-				description: state,
-				percent_complete: 0.0,
+				Name: goalString,
+				Description: state,
+				PercentComplete: 0.0,
 			}
-			goals = append(goals, &g)
+			goals = append(goals, g)
 		}
 	}
 	return goals
 }
 
-func goalPrinter(g *Goal) {
-	fmt.Printf("Name: %s\n", g.name)
-	fmt.Printf("Description: %s\n", g.description)
-	fmt.Printf("%g %%\n", g.percent_complete)
+func goalPrinter(g Goal) {
+	fmt.Printf("Name: %s\n", g.Name)
+	fmt.Printf("Description: %s\n", g.Description)
+	fmt.Printf("%g %%\n", g.PercentComplete)
 }
 
 func workoutPrinter(w Workout) {

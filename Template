@@ -5,11 +5,16 @@
   <body>
     <h1>This is a Heading</h1>
     <hr>
-    {{with .}}
+    <table>
+      <tr>
+	<th>Name</th><th>Description</th><th>Percent Complete</th>
+      </tr>
     {{range .}}
-    {{.name}}<br/>
+      <tr>
+	<td>{{.Name}}</td><td>{{.Description}}</td><td>{{.PercentComplete}}</td>
+      </tr>
     {{end}}
-    {{end}}
+    </table>
     </ul>
   </body>
 </html>
