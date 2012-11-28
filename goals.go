@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"regexp"
+	"strconv"
 	"html/template"
 	"bytes"
 )
@@ -85,23 +86,67 @@ func goalParser() []Goal {
 	return goals
 }
 
+func workoutParser() []Workout {
+	// workouts array
+	workouts := []Workout{}
+
+	// regexes
+	workoutRegex, err := regexp.Compile(`^\| <`)
+
+	// load the workouts file
+	content, err := ioutil.ReadFile(fitnessPath)
+	if err != nil { panic(err) }
+	lines := strings.Split(string(content), "\n")
+	if err != nil { panic(err) }
+
+	for _ ,line := range lines {
+		b := []byte(line)
+		if workoutRegex.Match(b) {
+			workoutArray := strings.Split(line, "|")
+
+			date := workoutArray[1]
+			stretches,err := strconv.ParseBool(strings.TrimSpace(workoutArray[2]))
+			if err != nil { panic(err) }
+			walkRun,err := strconv.ParseFloat(strings.TrimSpace(workoutArray[3]), 64)
+			if err != nil { panic(err) }
+			squats,err := strconv.ParseInt(strings.TrimSpace(workoutArray[4]), 10, 64)
+			if err != nil { panic(err) }
+			pushups,err := strconv.ParseInt(strings.TrimSpace(workoutArray[5]), 10, 64)
+			if err != nil { panic(err) }
+			lunges,err := strconv.ParseInt(strings.TrimSpace(workoutArray[6]), 10, 64)
+			if err != nil { panic(err) }
+			rows,err := strconv.ParseInt(strings.TrimSpace(workoutArray[7]), 10, 64)
+			if err != nil { panic(err) }
+			planks,err := strconv.ParseInt(strings.TrimSpace(workoutArray[8]), 10, 64)
+			if err != nil { panic(err) }
+			jumpingJacks,err := strconv.ParseInt(strings.TrimSpace(workoutArray[9]), 10, 64)
+			if err != nil { panic(err) }
+			weight,err := strconv.ParseFloat(strings.TrimSpace(workoutArray[10]), 64)
+			if err != nil { panic(err) }		
+
+			w := Workout {
+				Date: date,
+				Stretches: stretches,
+				WalkRun: walkRun,
+				Squats: squats,
+				Pushups: pushups,
+				Lunges: lunges,
+				Rows: rows,
+				Planks: planks,
+				JumpingJacks: jumpingJacks,
+				Weight: weight,		
+			}
+			
+			workouts = append(workouts, w)
+		}
+	}
+	return workouts
+}
+
 func main() {
 
-	w1 := Workout{
-		Date: "2012-12-01",
-		Stretches:  true,
-		WalkRun:  1.3,
-		Squats:  10,
-		Pushups:  5,
-		Lunges:  4,
-		Planks:  20,
-		JumpingJacks:  30,
-		Weight:  225.00,
-	}
-
-	
 	goals := goalParser()
-	workouts := []Workout{w1}
+	workouts := workoutParser()
 
 	t := template.New("Template")
 	t, err := t.ParseFiles(templatePath)

@@ -1,4 +1,5 @@
-* create a workout parser
+* DONE create a workout parser
+  CLOSED: [2012-11-27 Tue 20:28]
 * visualization insted of a simple table
 * some way to measure against goals
-* automation to check out most recent "ZachCore" to get update stats
+* automation to git check out most recent "ZachCore" to get update stats
