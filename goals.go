@@ -14,9 +14,9 @@ import (
 
 const port = ":8080"
 
-const goalsPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\TODO.org"
-const studyPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\Study.org"
-const fitnessPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\Fitness.org"
+const goalsPath = "/home/zach/Projects/ZachCore/Organizer/TODO.org"
+const studyPath = "/home/zach/Projects/ZachCore/Organizer/Study.org"
+const fitnessPath = "/home/zach/Projects/ZachCore/Organizer/Fitness.org"
 const templatePath = "Template"
 
 const stretchesGoal = true
@@ -37,7 +37,6 @@ type Goal struct {
 
 type Study struct {
 	Name            string
-	Epic            bool
 	PercentComplete string
 }
 
@@ -176,15 +175,10 @@ func goalParserEpic() []Goal {
 }
 
 func studyParser() []Study {
-	// states
-	state := "none"
-
 	// goals array
 	goals := []Study{}
 
 	// regexes
-	longTermRegex, err := regexp.Compile(`^\* Long Term`)
-	epicRegex, err := regexp.Compile(`^\* Epic Goals`)
 	goalRegex, err := regexp.Compile(`^\*\* `)
 
 	// load the goals file
@@ -199,11 +193,7 @@ func studyParser() []Study {
 
 	for _, line := range lines {
 		b := []byte(line)
-		if longTermRegex.Match(b) {
-			state = "longterm"
-		} else if epicRegex.Match(b) {
-			state = "epic"
-		} else if goalRegex.Match(b) {
+		if goalRegex.Match(b) {
 			goalArray := strings.Split(line, "** ")
 			myArray := strings.Split(goalArray[1], "[")
 			goalString := myArray[0]
@@ -214,16 +204,8 @@ func studyParser() []Study {
 				percent = "0"
 			}
 
-			var epic bool
-			if state == "epic" {
-				epic = true 
-			} else {
-				epic = false
-			}
-			
 			g := Study{
 				Name:            goalString,
-				Epic:            epic,
 				PercentComplete: percent,
 			}
 			goals = append(goals, g)
@@ -369,10 +351,14 @@ func printOut() {
 	fmt.Printf(out.String())
 }
 
+func updateGit() {
+}
+
 
 func main() {
 	//log.Printf("Goals webserver starting on port %s...", port)
 	//http.HandleFunc("/", rootHandler)
 	//http.ListenAndServe(port, nil)
+	updateGit()
 	printOut()
 }

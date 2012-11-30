@@ -47,7 +47,7 @@
 	  {{range .EpicGoals}}
 	  <div class="row-fluid">
 	    <div class="span6">
-	      <i class="icon-ok"></i>
+	      <i class="icon-star"></i>
 	      {{.Name}}
 	    </div>
 	    <div class="span4">
