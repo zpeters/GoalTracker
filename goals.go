@@ -3,14 +3,19 @@ package main
 import (
 	"bytes"
 	"fmt"
+	_ "log"
 	"html/template"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
+	"net/http"
 )
 
+const port = ":8080"
+
 const goalsPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\TODO.org"
+const studyPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\Study.org"
 const fitnessPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\Fitness.org"
 const templatePath = "Template"
 
@@ -26,8 +31,14 @@ const weightGoal = 190
 
 type Goal struct {
 	Name            string
-	Description     string
-	PercentComplete float32
+	Epic            bool
+	PercentComplete string
+}
+
+type Study struct {
+	Name            string
+	Epic            bool
+	PercentComplete string
 }
 
 type Workout struct {
@@ -45,7 +56,9 @@ type Workout struct {
 
 type Page struct {
 	Goals    []Goal
+	EpicGoals    []Goal
 	Workouts []Workout
+	Studys    []Study
 }
 
 func goalParser() []Goal {
@@ -76,13 +89,142 @@ func goalParser() []Goal {
 			state = "longterm"
 		} else if epicRegex.Match(b) {
 			state = "epic"
-		} else if goalRegex.Match(b) {
+		} else if goalRegex.Match(b) && state == "longterm" {
 			goalArray := strings.Split(line, "** ")
-			goalString := goalArray[1]
+			myArray := strings.Split(goalArray[1], "[")
+			goalString := myArray[0]
+			percentArr := strings.Split(myArray[1], "%]")
+			percentString := strings.Split(percentArr[0],"[")
+			percent := percentString[0]
+			if percent == "" {
+				percent = "0"
+			}
+
+			var epic bool
+			if state == "epic" {
+				epic = true 
+			} else {
+				epic = false
+			}
+			
 			g := Goal{
 				Name:            goalString,
-				Description:     state,
-				PercentComplete: 0.0,
+				Epic:            epic,
+				PercentComplete: percent,
+			}
+			goals = append(goals, g)
+		}
+	}
+	return goals
+}
+
+func goalParserEpic() []Goal {
+	// states
+	state := "none"
+
+	// goals array
+	goals := []Goal{}
+
+	// regexes
+	longTermRegex, err := regexp.Compile(`^\* Long Term`)
+	epicRegex, err := regexp.Compile(`^\* Epic Goals`)
+	goalRegex, err := regexp.Compile(`^\*\* `)
+
+	// load the goals file
+	content, err := ioutil.ReadFile(goalsPath)
+	if err != nil {
+		panic(err)
+	}
+	lines := strings.Split(string(content), "\n")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, line := range lines {
+		b := []byte(line)
+		if longTermRegex.Match(b) {
+			state = "longterm"
+		} else if epicRegex.Match(b) {
+			state = "epic"
+		} else if goalRegex.Match(b) && state == "epic" {
+			goalArray := strings.Split(line, "** ")
+			myArray := strings.Split(goalArray[1], "[")
+			goalString := myArray[0]
+			percentArr := strings.Split(myArray[1], "%]")
+			percentString := strings.Split(percentArr[0],"[")
+			percent := percentString[0]
+			if percent == "" {
+				percent = "0"
+			}
+
+			var epic bool
+			if state == "epic" {
+				epic = true 
+			} else {
+				epic = false
+			}
+			
+			g := Goal{
+				Name:            goalString,
+				Epic:            epic,
+				PercentComplete: percent,
+			}
+			goals = append(goals, g)
+		}
+	}
+	return goals
+}
+
+func studyParser() []Study {
+	// states
+	state := "none"
+
+	// goals array
+	goals := []Study{}
+
+	// regexes
+	longTermRegex, err := regexp.Compile(`^\* Long Term`)
+	epicRegex, err := regexp.Compile(`^\* Epic Goals`)
+	goalRegex, err := regexp.Compile(`^\*\* `)
+
+	// load the goals file
+	content, err := ioutil.ReadFile(studyPath)
+	if err != nil {
+		panic(err)
+	}
+	lines := strings.Split(string(content), "\n")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, line := range lines {
+		b := []byte(line)
+		if longTermRegex.Match(b) {
+			state = "longterm"
+		} else if epicRegex.Match(b) {
+			state = "epic"
+		} else if goalRegex.Match(b) {
+			goalArray := strings.Split(line, "** ")
+			myArray := strings.Split(goalArray[1], "[")
+			goalString := myArray[0]
+			percentArr := strings.Split(myArray[1], "%]")
+			percentString := strings.Split(percentArr[0],"[")
+			percent := percentString[0]
+			if percent == "" {
+				percent = "0"
+			}
+
+			var epic bool
+			if state == "epic" {
+				epic = true 
+			} else {
+				epic = false
+			}
+			
+			g := Study{
+				Name:            goalString,
+				Epic:            epic,
+				PercentComplete: percent,
 			}
 			goals = append(goals, g)
 		}
@@ -169,9 +311,12 @@ func workoutParser() []Workout {
 	return workouts
 }
 
-func main() {
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	var out bytes.Buffer
 
 	goals := goalParser()
+	epicGoals := goalParserEpic()
+	study := studyParser()
 	workouts := workoutParser()
 
 	t := template.New("Template")
@@ -180,15 +325,54 @@ func main() {
 		fmt.Printf("Error: %s", err)
 	}
 
-	var out bytes.Buffer
 	p := Page{
 		Goals:    goals,
+		EpicGoals: epicGoals,
+		Studys:    study,
 		Workouts: workouts,
 	}
+
+	err = t.Execute(&out, p)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	fmt.Fprintf(w, out.String())
+}
+
+func printOut() {
+	var out bytes.Buffer
+
+	goals := goalParser()
+	epicGoals := goalParserEpic()
+	study := studyParser()
+	workouts := workoutParser()
+
+	t := template.New("Template")
+	t, err := t.ParseFiles(templatePath)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	p := Page{
+		Goals:    goals,
+		EpicGoals: epicGoals,
+		Studys:    study,
+		Workouts: workouts,
+	}
+
 	err = t.Execute(&out, p)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 	}
 
 	fmt.Printf(out.String())
+}
+
+
+func main() {
+	//log.Printf("Goals webserver starting on port %s...", port)
+	//http.HandleFunc("/", rootHandler)
+	//http.ListenAndServe(port, nil)
+	printOut()
 }
