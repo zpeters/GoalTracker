@@ -59,6 +59,12 @@
 	  {{end}}
 	</div>
       </div>
+      <div class="row-fluid">
+	<div class="span8">
+	  <hr>
+	  <em>Last Update: {{.Timestamp}}</em>
+	</div>
+      </div>
     </div>
   </body>
 </html>

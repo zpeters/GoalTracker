@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"net/http"
+	"time"
 )
 
 const port = ":8080"
@@ -58,6 +58,7 @@ type Page struct {
 	EpicGoals    []Goal
 	Workouts []Workout
 	Studys    []Study
+	Timestamp string
 }
 
 func goalParser() []Goal {
@@ -293,35 +294,6 @@ func workoutParser() []Workout {
 	return workouts
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	var out bytes.Buffer
-
-	goals := goalParser()
-	epicGoals := goalParserEpic()
-	study := studyParser()
-	workouts := workoutParser()
-
-	t := template.New("Template")
-	t, err := t.ParseFiles(templatePath)
-	if err != nil {
-		fmt.Printf("Error: %s", err)
-	}
-
-	p := Page{
-		Goals:    goals,
-		EpicGoals: epicGoals,
-		Studys:    study,
-		Workouts: workouts,
-	}
-
-	err = t.Execute(&out, p)
-	if err != nil {
-		fmt.Printf("Error: %s", err)
-	}
-
-	fmt.Fprintf(w, out.String())
-}
-
 func printOut() {
 	var out bytes.Buffer
 
@@ -329,6 +301,7 @@ func printOut() {
 	epicGoals := goalParserEpic()
 	study := studyParser()
 	workouts := workoutParser()
+	timestamp := time.Now().Format(time.ANSIC)
 
 	t := template.New("Template")
 	t, err := t.ParseFiles(templatePath)
@@ -341,6 +314,7 @@ func printOut() {
 		EpicGoals: epicGoals,
 		Studys:    study,
 		Workouts: workouts,
+		Timestamp: timestamp,
 	}
 
 	err = t.Execute(&out, p)
@@ -351,14 +325,6 @@ func printOut() {
 	fmt.Printf(out.String())
 }
 
-func updateGit() {
-}
-
-
 func main() {
-	//log.Printf("Goals webserver starting on port %s...", port)
-	//http.HandleFunc("/", rootHandler)
-	//http.ListenAndServe(port, nil)
-	updateGit()
 	printOut()
 }
