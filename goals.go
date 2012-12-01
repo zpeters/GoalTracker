@@ -12,11 +12,11 @@ import (
 	"time"
 )
 
-const port = ":8080"
+const debug = false
 
-const goalsPath = "/tmp/ZachCore/Organizer/TODO.org"
-const studyPath = "/tmp/ZachCore/Organizer/Study.org"
-const fitnessPath = "/tmp/ZachCore/Organizer/Fitness.org"
+const dataPath = "c:\\Users\\Zach\\Projects\\ZachCore\\Organizer\\"
+//const dataPath = "/tmp/ZachCore/Organizer/"
+//const dataPath = "/home/zach/Projects/ZachCore/Organizer/"
 const templatePath = "Template"
 
 const stretchesGoal = true
@@ -74,7 +74,8 @@ func goalParser() []Goal {
 	goalRegex, err := regexp.Compile(`^\*\* `)
 
 	// load the goals file
-	content, err := ioutil.ReadFile(goalsPath)
+	content, err := ioutil.ReadFile(dataPath + "TODO.org")
+	if debug { log.Printf("Parsing file %s", dataPath + "TODO.org") }
 	if err != nil {
 		panic(err)
 	}
@@ -83,8 +84,11 @@ func goalParser() []Goal {
 		panic(err)
 	}
 
-	for _, line := range lines {
-		log.Printf("Processing line: %s", line)
+	if debug { log.Printf("Found %d lines", len(lines)) }
+
+	for i, line := range lines {
+		if debug { log.Printf("\tProcessing line: %s", line) }
+		if debug { log.Printf("\tProcessing line: %d", i) }
 		b := []byte(line)
 		if longTermRegex.Match(b) {
 			state = "longterm"
@@ -94,13 +98,15 @@ func goalParser() []Goal {
 			goalArray := strings.Split(line, "** ")
 			myArray := strings.Split(goalArray[1], "[")
 			goalString := myArray[0]
+			if debug { log.Printf("\t\tNormal goal: %s", goalString) }
 			percentArr := strings.Split(myArray[1], "%]")
 			percentString := strings.Split(percentArr[0],"[")
 			percent := percentString[0]
 			if percent == "" {
 				percent = "0"
 			}
-
+			if debug { log.Printf("\t\t\tPercent Complete: %s", percent) }
+			
 			var epic bool
 			if state == "epic" {
 				epic = true 
@@ -114,6 +120,8 @@ func goalParser() []Goal {
 				PercentComplete: percent,
 			}
 			goals = append(goals, g)
+		} else {
+			if debug { log.Printf("\t\t Ignored...") }
 		}
 	}
 	return goals
@@ -132,7 +140,7 @@ func goalParserEpic() []Goal {
 	goalRegex, err := regexp.Compile(`^\*\* `)
 
 	// load the goals file
-	content, err := ioutil.ReadFile(goalsPath)
+	content, err := ioutil.ReadFile(dataPath + "TODO.org")
 	if err != nil {
 		panic(err)
 	}
@@ -150,6 +158,7 @@ func goalParserEpic() []Goal {
 		} else if goalRegex.Match(b) && state == "epic" {
 			goalArray := strings.Split(line, "** ")
 			myArray := strings.Split(goalArray[1], "[")
+			if debug { log.Printf("My Array: %v", myArray) }
 			goalString := myArray[0]
 			percentArr := strings.Split(myArray[1], "%]")
 			percentString := strings.Split(percentArr[0],"[")
@@ -184,7 +193,7 @@ func studyParser() []Study {
 	goalRegex, err := regexp.Compile(`^\*\* `)
 
 	// load the goals file
-	content, err := ioutil.ReadFile(studyPath)
+	content, err := ioutil.ReadFile(dataPath + "Study.org")
 	if err != nil {
 		panic(err)
 	}
@@ -224,7 +233,7 @@ func workoutParser() []Workout {
 	workoutRegex, err := regexp.Compile(`^\| <`)
 
 	// load the workouts file
-	content, err := ioutil.ReadFile(fitnessPath)
+	content, err := ioutil.ReadFile(dataPath + "Fitness.org")
 	if err != nil {
 		panic(err)
 	}
