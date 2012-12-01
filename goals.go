@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	_ "log"
+	"log"
 	"html/template"
 	"io/ioutil"
 	"regexp"
@@ -84,6 +84,7 @@ func goalParser() []Goal {
 	}
 
 	for _, line := range lines {
+		log.Printf("Processing line: %s", line)
 		b := []byte(line)
 		if longTermRegex.Match(b) {
 			state = "longterm"
