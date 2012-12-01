@@ -2,8 +2,11 @@
   CLOSED: [2012-11-27 Tue 20:28]
 * DONE visualization insted of a simple table
 * DONE automation to git check out most recent "ZachCore" to get update stats
-* some way to measure against goals
-* time stamp
-* make goals have acheievements / exp
-* clean up dupe code
-* tighten up layout
+* TODO data file root path instead of individual paths for each
+* TODO more debugging
+* TODO fix parser
+* TODO some way to measure against goals
+* TODO time stamp
+* TODO make goals have acheievements / exp
+* TODO clean up dupe code
+* TODO tighten up layout
