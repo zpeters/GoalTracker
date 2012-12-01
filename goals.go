@@ -14,9 +14,9 @@ import (
 
 const port = ":8080"
 
-const goalsPath = "/home/zach/Projects/ZachCore/Organizer/TODO.org"
-const studyPath = "/home/zach/Projects/ZachCore/Organizer/Study.org"
-const fitnessPath = "/home/zach/Projects/ZachCore/Organizer/Fitness.org"
+const goalsPath = "/tmp/ZachCore/Organizer/TODO.org"
+const studyPath = "/tmp/ZachCore/Organizer/Study.org"
+const fitnessPath = "/tmp/ZachCore/Organizer/Fitness.org"
 const templatePath = "Template"
 
 const stretchesGoal = true
