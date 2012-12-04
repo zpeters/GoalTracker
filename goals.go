@@ -8,12 +8,13 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"flag"
 )
 
 const debug = false
 
-const dataPath = "c:\\users\\zach\\Projects\\ZachCore\\Organizer\\"
-const templatePath = "Template"
+var dataPath *string
+var templatePath *string
 
 
 type Goal struct {
@@ -51,7 +52,7 @@ func todoParser(files ...string) (todo, done int) {
 	uncheckedRegex, _ := regexp.Compile(`\- \[ \]`)
 	
 	for _, file := range files {
-		content, _ := ioutil.ReadFile(dataPath + file)
+		content, _ := ioutil.ReadFile(*dataPath + file)
 		lines := strings.Split(string(content), "\n")
 
 		for _, line := range lines {
@@ -78,7 +79,7 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 	
 	for _, file := range files {
 		var lines []string
-		content, err := ioutil.ReadFile(dataPath + file)
+		content, err := ioutil.ReadFile(*dataPath + file)
 		if err != nil { panic(err) }
 
 		// Never do this it's really dirty
@@ -128,7 +129,7 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 	
 }
 
-func printOut() {
+func render() {
 	var out bytes.Buffer
 
 	normal, epic, study := goalParser("TODO.org", "Study.org")
@@ -136,7 +137,7 @@ func printOut() {
 	timestamp := time.Now().Format(time.ANSIC)
 
 	t := template.New("Template")
-	t, err := t.ParseFiles(templatePath)
+	t, err := t.ParseFiles(*templatePath)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 	}
@@ -160,5 +161,19 @@ func printOut() {
 }
 
 func main() {
-	printOut()
+	dataPath = flag.String("dataPath", "Unknown", "Data path")
+	templatePath = flag.String("templatePath", "Unknown", "Template path")
+	flag.Parse()
+	
+	if (flag.NFlag() != 2) && (flag.NArg() != 2) {
+		fmt.Printf("Usage:\n")
+		fmt.Printf("-dataPath=/path/to/Organizer\n")
+		fmt.Printf("-templatePath=/path/to/Goals/Template\n")
+		return
+	} else {
+		fmt.Printf("Datapath: %s\n", *dataPath)
+		fmt.Printf("Templatepath: %s\n", *templatePath)
+		render()
+	}
+
 }
