@@ -1,3 +1,4 @@
+* DONE background color
 * TODO some way to measure against goals
 * TODO make goals have acheievements / exp
 * TODO clean up dupe code

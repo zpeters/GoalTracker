@@ -7,7 +7,7 @@
     <script src="http://code.jquery.com/jquery-latest.js"></script>
 
   </head>
-  <body>
+  <body style="background-color: #aabbaa;">
     <div class="container-fluid">
       <div class="row-fluid">
 	<div class="span4">
@@ -59,16 +59,24 @@
 	  {{end}}
 	</div>
       </div>
+      <div class="row-fluid"><div class="span10">&nbsp;</div></div>
       <div class="row-fluid">
-	<div class="span12">
-	  <hr>
+	<div class="span2">
 	  <h2>Tasks</h2>
-	  <h4>{{.Done}} tasks completed so far!</h4>
-	  <h4>{{.Todo}} tasks todo</h4>
-	  <div class="progress progress-striped">
-	    <div class="bar" style="width: {{.PercentDone}}%%"><font color="black">{{.PercentDone}}%%</font></div>
 	</div>
       </div>
+      <div class="row-fluid">
+	<div class="span4">
+	  <div class="progress progress-striped">
+	    <div class="bar" style="width: {{.PercentDone}}%%">{{.PercentDone}}%%</div>
+	  </div>
+	</div>
+	<div class="span4">
+	  <h4>{{.Todo}} tasks to do</h4>
+	  <h4>{{.Done}} tasks completed so far!</h4>
+	</div>
+      </div>
+
       <div class="row-fluid">
 	<div class="span12">
 	  <hr>
