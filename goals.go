@@ -171,8 +171,6 @@ func main() {
 		fmt.Printf("-templatePath=/path/to/Goals/Template\n")
 		return
 	} else {
-		fmt.Printf("Datapath: %s\n", *dataPath)
-		fmt.Printf("Templatepath: %s\n", *templatePath)
 		render()
 	}
 
