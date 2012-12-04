@@ -2,3 +2,5 @@
 * TODO make goals have acheievements / exp
 * TODO clean up dupe code
 * TODO tighten up layout
+* TODO extra info section that provides a breakdown of goals
+* TODO fitness section
