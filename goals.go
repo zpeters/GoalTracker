@@ -14,9 +14,7 @@ import (
 
 const debug = false
 
-const dataPath = "c:\\Users\\Zach\\Projects\\ZachCore\\Organizer\\"
-//const dataPath = "/tmp/ZachCore/Organizer/"
-//const dataPath = "/home/zach/Projects/ZachCore/Organizer/"
+const dataPath = "/tmp/ZachCore/Organizer/"
 const templatePath = "Template"
 
 const stretchesGoal = true
@@ -54,11 +52,60 @@ type Workout struct {
 }
 
 type Page struct {
-	Goals    []Goal
-	EpicGoals    []Goal
-	Workouts []Workout
+	Goals     []Goal
+	EpicGoals []Goal
+	Workouts  []Workout
 	Studys    []Study
+	Todo      int
+	Done      int
+	PercentDone int
 	Timestamp string
+}
+
+func doneParser(file string) int {
+	var count int
+
+	doneRegex, err := regexp.Compile(`^\** DONE`)
+	if err != nil { panic(err) }
+	checkedRegex, err := regexp.Compile(`- [X]`)
+	if err != nil { panic(err) }
+
+	content, err := ioutil.ReadFile(dataPath + file)
+	if err != nil { panic(err) }
+	
+	lines := strings.Split(string(content), "\n")
+	if err != nil { panic(err) }
+	
+	for _, line := range lines {
+		b := []byte(line)
+		if doneRegex.Match(b) || checkedRegex.Match(b) {
+			count++
+		}
+	}
+	return count
+}
+
+func todoParser(file string) int {
+	var count int
+
+	todoRegex, err := regexp.Compile(`TODO`)
+	if err != nil { panic(err) }
+	uncheckedRegex, err := regexp.Compile(`\- \[ \]`)
+	if err != nil { panic(err) }
+
+	content, err := ioutil.ReadFile(dataPath + file)
+	if err != nil { panic(err) }
+	
+	lines := strings.Split(string(content), "\n")
+	if err != nil { panic(err) }
+	
+	for _, line := range lines {
+		b := []byte(line)
+		if todoRegex.Match(b) || uncheckedRegex.Match(b) {
+			count++
+		}
+	}
+	return count
 }
 
 func goalParser() []Goal {
@@ -311,6 +358,9 @@ func printOut() {
 	epicGoals := goalParserEpic()
 	study := studyParser()
 	workouts := workoutParser()
+	done := doneParser("TODO.org_archive")
+	done += doneParser("TODO.org")
+	todo := todoParser("TODO.org")
 	timestamp := time.Now().Format(time.ANSIC)
 
 	t := template.New("Template")
@@ -320,10 +370,13 @@ func printOut() {
 	}
 
 	p := Page{
-		Goals:    goals,
+		Goals:     goals,
 		EpicGoals: epicGoals,
 		Studys:    study,
-		Workouts: workouts,
+		Workouts:  workouts,
+		Todo:      todo,
+		Done:      done,
+		PercentDone: (done * 100) / (todo + done),
 		Timestamp: timestamp,
 	}
 
