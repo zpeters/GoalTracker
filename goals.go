@@ -83,7 +83,8 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 	normalRegex, _ := regexp.Compile(`^\* Long Term`)
 	epicRegex, _ := regexp.Compile(`^\* Epic Goals`)
 	studyRegex, _ := regexp.Compile(`^\* Study Goals`)
-	goalRegex, _ := regexp.Compile(`^\*\*.+\[\d.%\]`)
+	//goalRegex, _ := regexp.Compile(`^\*\*.+\[\d.%\]`)
+	goalRegex, _ := regexp.Compile(`^\*\*.+%`)
 
 	if debug { log.Printf("Processing Goals") }
 	
@@ -101,7 +102,7 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 		}
 
 		for _, line := range lines {
-			if debug { log.Printf("\t\t%s", line) }
+			//if debug { log.Printf("\t\t%s", line) }
 			b := []byte(line)
 			if normalRegex.Match(b) {
 				if debug { log.Printf("\t\tState 'normal'") }
