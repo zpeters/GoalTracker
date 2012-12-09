@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 	"flag"
+	"log"
 )
 
 const debug = false
@@ -59,12 +60,13 @@ func todoParser(files ...string) (todo, done int) {
 		lines := strings.Split(string(content), "\n")
 
 		for _, line := range lines {
-			if debug { log.Printf("\t\t%s", line) }
 			b := []byte(line)
 			if doneRegex.Match(b) || checkedRegex.Match(b) {
+				if debug { log.Printf("\t\t%s", line) }
 				if debug { log.Printf("\t\tfound done") }
 				doneCount++
 			} else if todoRegex.Match(b) || uncheckedRegex.Match(b) {
+				if debug { log.Printf("\t\t%s", line) }		
 				if debug { log.Printf("\t\tfound todo") }
 				todoCount++
 			}
@@ -81,7 +83,7 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 	normalRegex, _ := regexp.Compile(`^\* Long Term`)
 	epicRegex, _ := regexp.Compile(`^\* Epic Goals`)
 	studyRegex, _ := regexp.Compile(`^\* Study Goals`)
-	goalRegex, _ := regexp.Compile(`^\*\* `)
+	goalRegex, _ := regexp.Compile(`^\*\*.+\[\d.%\]`)
 
 	if debug { log.Printf("Processing Goals") }
 	
@@ -182,7 +184,7 @@ func main() {
 	
 	if (flag.NFlag() != 2) && (flag.NArg() != 2) {
 		fmt.Printf("Usage:\n")
-		fmt.Printf("-dataPath=/path/to/Organizer\n")
+		fmt.Printf("-dataPath=/path/to/Organizer/\n")
 		fmt.Printf("-templatePath=/path/to/Goals/Template\n")
 		return
 	} else {
