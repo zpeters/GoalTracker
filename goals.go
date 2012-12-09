@@ -50,16 +50,22 @@ func todoParser(files ...string) (todo, done int) {
 	checkedRegex, _ := regexp.Compile(`- [X]`)
 	todoRegex, _ := regexp.Compile(`^\** TODO`)
 	uncheckedRegex, _ := regexp.Compile(`\- \[ \]`)
+
+	if debug { log.Printf("Processing todos/dones") }
 	
 	for _, file := range files {
+		if debug { log.Printf("\tprocessing file %s", file) }
 		content, _ := ioutil.ReadFile(*dataPath + file)
 		lines := strings.Split(string(content), "\n")
 
 		for _, line := range lines {
+			if debug { log.Printf("\t\t%s", line) }
 			b := []byte(line)
 			if doneRegex.Match(b) || checkedRegex.Match(b) {
+				if debug { log.Printf("\t\tfound done") }
 				doneCount++
 			} else if todoRegex.Match(b) || uncheckedRegex.Match(b) {
+				if debug { log.Printf("\t\tfound todo") }
 				todoCount++
 			}
 		}
@@ -76,8 +82,11 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 	epicRegex, _ := regexp.Compile(`^\* Epic Goals`)
 	studyRegex, _ := regexp.Compile(`^\* Study Goals`)
 	goalRegex, _ := regexp.Compile(`^\*\* `)
+
+	if debug { log.Printf("Processing Goals") }
 	
 	for _, file := range files {
+		if debug { log.Printf("\tprocessing file %s", file) }
 		var lines []string
 		content, err := ioutil.ReadFile(*dataPath + file)
 		if err != nil { panic(err) }
@@ -90,19 +99,25 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 		}
 
 		for _, line := range lines {
+			if debug { log.Printf("\t\t%s", line) }
 			b := []byte(line)
 			if normalRegex.Match(b) {
+				if debug { log.Printf("\t\tState 'normal'") }
 				state = "normal"
 			} else if epicRegex.Match(b) {
+				if debug { log.Printf("\t\tState 'epic'") }
 				state = "epic"
 			} else if studyRegex.Match(b) {
+				if debug { log.Printf("\t\tState 'study'") }
 				state = "study"
 			}
 
 			if goalRegex.Match(b) {
+				if debug { log.Printf("\t\tFound goal") }
 				lineArray := strings.Split(line, "** ")
 				goalArray := strings.Split(lineArray[1], "[")
 				goalString := goalArray[0]
+				if debug { log.Printf("\t\tgoal string: %v", goalString) }
 
 				percentArray := strings.Split(goalArray[1], "%]")
 				percent := percentArray[0]
