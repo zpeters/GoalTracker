@@ -10,10 +10,10 @@ import (
 	"time"
 	"flag"
 	"log"
+	"os"
 )
 
-const debug = false
-
+var DEBUG = false
 var dataPath *string
 var templatePath *string
 
@@ -52,22 +52,22 @@ func todoParser(files ...string) (todo, done int) {
 	todoRegex, _ := regexp.Compile(`^\** TODO`)
 	uncheckedRegex, _ := regexp.Compile(`\- \[ \]`)
 
-	if debug { log.Printf("Processing todos/dones") }
+	if DEBUG { log.Printf("Processing todos/dones") }
 	
 	for _, file := range files {
-		if debug { log.Printf("\tprocessing file %s", file) }
+		if DEBUG { log.Printf("\tprocessing file %s", file) }
 		content, _ := ioutil.ReadFile(*dataPath + file)
 		lines := strings.Split(string(content), "\n")
 
 		for _, line := range lines {
 			b := []byte(line)
 			if doneRegex.Match(b) || checkedRegex.Match(b) {
-				if debug { log.Printf("\t\t%s", line) }
-				if debug { log.Printf("\t\tfound done") }
+				if DEBUG { log.Printf("\t\t%s", line) }
+				if DEBUG { log.Printf("\t\tfound done") }
 				doneCount++
 			} else if todoRegex.Match(b) || uncheckedRegex.Match(b) {
-				if debug { log.Printf("\t\t%s", line) }		
-				if debug { log.Printf("\t\tfound todo") }
+				if DEBUG { log.Printf("\t\t%s", line) }		
+				if DEBUG { log.Printf("\t\tfound todo") }
 				todoCount++
 			}
 		}
@@ -86,10 +86,10 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 	//goalRegex, _ := regexp.Compile(`^\*\*.+\[\d.%\]`)
 	goalRegex, _ := regexp.Compile(`^\*\*.+%`)
 
-	if debug { log.Printf("Processing Goals") }
+	if DEBUG { log.Printf("Processing Goals") }
 	
 	for _, file := range files {
-		if debug { log.Printf("\tprocessing file %s", file) }
+		if DEBUG { log.Printf("\tprocessing file %s", file) }
 		var lines []string
 		content, err := ioutil.ReadFile(*dataPath + file)
 		if err != nil { panic(err) }
@@ -102,25 +102,25 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 		}
 
 		for _, line := range lines {
-			//if debug { log.Printf("\t\t%s", line) }
+			//if DEBUG { log.Printf("\t\t%s", line) }
 			b := []byte(line)
 			if normalRegex.Match(b) {
-				if debug { log.Printf("\t\tState 'normal'") }
+				if DEBUG { log.Printf("\t\tState 'normal'") }
 				state = "normal"
 			} else if epicRegex.Match(b) {
-				if debug { log.Printf("\t\tState 'epic'") }
+				if DEBUG { log.Printf("\t\tState 'epic'") }
 				state = "epic"
 			} else if studyRegex.Match(b) {
-				if debug { log.Printf("\t\tState 'study'") }
+				if DEBUG { log.Printf("\t\tState 'study'") }
 				state = "study"
 			}
 
 			if goalRegex.Match(b) {
-				if debug { log.Printf("\t\tFound goal") }
+				if DEBUG { log.Printf("\t\tFound goal") }
 				lineArray := strings.Split(line, "** ")
 				goalArray := strings.Split(lineArray[1], "[")
 				goalString := goalArray[0]
-				if debug { log.Printf("\t\tgoal string: %v", goalString) }
+				if DEBUG { log.Printf("\t\tgoal string: %v", goalString) }
 
 				percentArray := strings.Split(goalArray[1], "%]")
 				percent := percentArray[0]
@@ -184,10 +184,8 @@ func main() {
 	flag.Parse()
 	
 	if (flag.NFlag() != 2) && (flag.NArg() != 2) {
-		fmt.Printf("Usage:\n")
-		fmt.Printf("-dataPath=/path/to/Organizer/\n")
-		fmt.Printf("-templatePath=/path/to/Goals/Template\n")
-		return
+		flag.Usage()
+		os.Exit(0)
 	} else {
 		render()
 	}
