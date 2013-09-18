@@ -8,17 +8,26 @@
   <body>
 
     <div class="jumbotron">
-      <div class="page-header">
-	<h1>My Goals <small>{{.Timestamp}}</small></h1>
-	<p>
-	  {{.Done}} tasks completed so far! {{.Todo}} tasks to do
-	</p>
+      <div class="row">
+        <div class="col-lg-8">
+	  <div class="page-header">
+	    <h1>My Goals <small>{{.Timestamp}}</small></h1>
+	    <p>
+	      {{.Done}} tasks completed so far! {{.Todo}} tasks to do
+	    </p>
+	  </div>
+	</div>
+	<div class="col-lg-4">
+	  <div class="panel panel-success">
+	    <div class="panel-heading">Daily Reminder</div>
+	    <div class="panel-body">
+	  {{range .Dailys}}
+	  {{.Name}}<br>
+	  {{end}}
+	  </div>
+	</div>
       </div>
     </div>
-
-
-
-
 
     <div class="container">
       <!-- Example row of columns -->

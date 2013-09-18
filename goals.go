@@ -27,6 +27,7 @@ type Page struct {
 	Goals     []Goal
 	EpicGoals []Goal
 	Studys    []Goal
+	Dailys    []Goal
 	Todo      int
 	Done      int
 	PercentDone int
@@ -76,13 +77,15 @@ func todoParser(files ...string) (todo, done int) {
 }
 
 
-func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
+func goalParser(files ...string) (normalGoals, epicGoals, studyGoals, dailyGoals []Goal) {
 	var state string = "none"
 
 	// regexes
 	normalRegex, _ := regexp.Compile(`^\* Long Term`)
 	epicRegex, _ := regexp.Compile(`^\* Epic Goals`)
 	studyRegex, _ := regexp.Compile(`^\* Study Goals`)
+	dailyRegex, _ := regexp.Compile(`^\* Daily Goals`)
+
 	//goalRegex, _ := regexp.Compile(`^\*\*.+\[\d.%\]`)
 	goalRegex, _ := regexp.Compile(`^\*\*.+%`)
 
@@ -113,6 +116,9 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 			} else if studyRegex.Match(b) {
 				if DEBUG { log.Printf("\t\tState 'study'") }
 				state = "study"
+			} else if dailyRegex.Match(b) {
+				if DEBUG { log.Printf("\t\tState 'daily'") }
+				state = "daily"
 			}
 
 			if goalRegex.Match(b) {
@@ -139,18 +145,20 @@ func goalParser(files ...string) (normalGoals, epicGoals, studyGoals []Goal) {
 					epicGoals = append(epicGoals, g)
 				} else if state == "study" {
 					studyGoals = append(studyGoals, g)
+				} else if state == "daily" {
+					dailyGoals = append(dailyGoals, g)
 				}
 			}
 		}
 	}
-	return normalGoals, epicGoals, studyGoals
+	return normalGoals, epicGoals, studyGoals, dailyGoals
 	
 }
 
 func render() {
 	var out bytes.Buffer
 
-	normal, epic, study := goalParser("TODO.org", "Study.org")
+	normal, epic, study, daily := goalParser("TODO.org", "Study.org")
 	todo, done := todoParser("TODO.org", "TODO.org_archive")
 	timestamp := time.Now().Format(time.ANSIC)
 
@@ -164,6 +172,7 @@ func render() {
 		Goals:     normal,
 		EpicGoals: epic,
 		Studys:    study,
+		Dailys: daily,
 		Todo:      todo,
 		Done:      done,
 		PercentDone: (done * 100) / (todo + done),
